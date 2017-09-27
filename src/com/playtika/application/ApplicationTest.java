@@ -1,4 +1,4 @@
-package com.playtika;
+package com.playtika.application;
 
 import org.junit.Test;
 
@@ -43,7 +43,13 @@ public class ApplicationTest {
 
     @Test
     public void textStartsFromNonLetterSymbols() {
-        int wordsCount = new Application().countWords("1/,I Have 5 dollars");
+        int wordsCount = new Application().countWords("/,I Have 5 dollars");
+        assertEquals(4, wordsCount);
+    }
+
+    @Test
+    public void textIsSplitByEnter() {
+        int wordsCount = new Application().countWords("\nI \n\n Have \t 5 dollars");
         assertEquals(4, wordsCount);
     }
 }
