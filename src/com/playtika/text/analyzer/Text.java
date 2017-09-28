@@ -43,6 +43,9 @@ public class Text {
 	}
 
 	private List<String> getAllWordsList() {
+		if (inputText == null) {
+			return new LinkedList<>();
+		}
 		List<String> resultList = new LinkedList<>(Arrays.asList(inputText.split("[^a-zA-Z_0-9]")));
 		resultList.removeIf((w) -> w.length() == 0);
 		return resultList;

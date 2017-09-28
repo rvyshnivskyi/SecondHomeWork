@@ -27,8 +27,8 @@ public class ApplicationTest {
     }
 
     @Test
-    public void whitespaceTextHasNoWords() {
-        int wordsCount = application.countWords("\n\n   ");
+    public void textWithoutWordsHasNoWords() {
+        int wordsCount = application.countWords("\n\n  ,./ ");
         assertEquals(0, wordsCount);
     }
 
