@@ -7,7 +7,7 @@ import static org.junit.Assert.*;
 
 public class ApplicationTest {
 
-	private Application application;
+    public Application application;
 
 	@Before
 	public void setUp() {
@@ -16,7 +16,7 @@ public class ApplicationTest {
 
 	@Test
     public void textIsSplitByWhitespace() {
-        int wordsCount = application.countWords("I have 5 dollars");
+        int wordsCount = application.countWords(" I have 5     dollars");
         assertEquals(4, wordsCount);
     }
 
@@ -25,46 +25,22 @@ public class ApplicationTest {
         int wordsCount = application.countWords("");
         assertEquals(0, wordsCount);
     }
-    
-    @Test
-    public void textIsSplitByDoubleWhitespace() {
-        int wordsCount = application.countWords("I  have  5  dollars");
-        assertEquals(4, wordsCount);
-    }
 
     @Test
     public void whitespaceTextHasNoWords() {
-        int wordsCount = application.countWords("   ");
-        assertEquals(0, wordsCount);
-    }
-
-    @Test
-    public void newLinesTextHasNoWords() {
-        int wordsCount = application.countWords("\n\n\n");
+        int wordsCount = application.countWords("\n\n   ");
         assertEquals(0, wordsCount);
     }
 
     @Test
     public void textIsSplitByNonLetterSymbols() {
-        int wordsCount = application.countWords("I,Have.5/dollars");
+        int wordsCount = application.countWords(",\nI,\tHave.5/dollars");
         assertEquals(4, wordsCount);
     }
 
     @Test
-    public void textStartsFromWhiteSpace() {
-        int wordsCount = application.countWords(" I Have 5 dollars");
-        assertEquals(4, wordsCount);
-    }
-
-    @Test
-    public void textStartsFromNonLetterSymbols() {
-        int wordsCount = application.countWords("/,I Have 5 dollars");
-        assertEquals(4, wordsCount);
-    }
-
-    @Test
-    public void textIsSplitByNewLineAndTab() {
-        int wordsCount = application.countWords("\nI \n\n Have \t 5 dollars");
-        assertEquals(4, wordsCount);
+    public void nullableTextHasNoWords() {
+        int wordCount = application.countWords(null);
+        assertEquals(0, wordCount);
     }
 }
