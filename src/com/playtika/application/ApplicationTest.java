@@ -7,7 +7,7 @@ import static org.junit.Assert.*;
 
 public class ApplicationTest {
 
-    public Application application;
+    Application application;
 
 	@Before
 	public void setUp() {

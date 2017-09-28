@@ -6,7 +6,7 @@ import static org.junit.Assert.*;
 
 public class TextTest {
 
-    public Text text;
+    Text text;
 
     @Test
     public void nullableTextHasZeroLength() {
