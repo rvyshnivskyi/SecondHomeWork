@@ -15,5 +15,5 @@ public class Application {
         List<String> resultList = new LinkedList<>(Arrays.asList(text.split("[^a-zA-Z_0-9]")));
         resultList.removeIf((w) -> w.length() == 0);
         return resultList.size();
-    }
+       }
 }
