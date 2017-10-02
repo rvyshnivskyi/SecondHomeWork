@@ -39,7 +39,7 @@ public class Text {
 	}
 
 	private List<String> getUniqueWordsList(Map<String, Integer> wordFrequencies) {
-		wordFrequencies.entrySet().removeIf((entry) -> entry.getValue().compareTo(1) == 1);
+		wordFrequencies.entrySet().removeIf((entry) -> entry.getValue() > 1);
 		return new ArrayList<>(wordFrequencies.keySet());
 	}
 
