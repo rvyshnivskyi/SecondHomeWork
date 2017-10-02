@@ -11,7 +11,7 @@ public class Application {
             return 0;
         }
         List<String> words = new LinkedList<>(Arrays.asList(text.split("[^a-zA-Z_0-9]")));
-        words.removeIf((w) -> w.length() == 0);
+        words.removeIf(String::isEmpty);
         return words.size();
        }
 }

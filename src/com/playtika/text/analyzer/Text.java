@@ -19,6 +19,7 @@ public class Text {
 	}
 
 	public List<String> getTopWords(int topWordsCount) {
+		if (topWordsCount < 0) throw new IllegalArgumentException("Parameter of this method must be positive");
 		List<String> uniqueWordsList = getUniqueWordsList(getWordFrequencies());
 		Collections.sort(uniqueWordsList);
 		if (uniqueWordsList.size() < topWordsCount) return uniqueWordsList;
@@ -47,7 +48,7 @@ public class Text {
 			return new LinkedList<>();
 		}
 		List<String> resultList = new LinkedList<>(Arrays.asList(inputText.split("[^a-zA-Z_0-9]")));
-		resultList.removeIf((w) -> w.length() == 0);
+		resultList.removeIf(String::isEmpty);
 		return resultList;
 	}
 }
