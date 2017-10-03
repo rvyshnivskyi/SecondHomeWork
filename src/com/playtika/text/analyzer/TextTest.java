@@ -101,11 +101,10 @@ public class TextTest {
         assertThat(topWords, empty());
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void getTopWordsMethodWithZeroParameter() {
         initialiseTestTextObject(textForTestingGetTopWordsMethod);
-        List<String> topWords = text.getTopWords(0);
-        assertThat(topWords, empty());
+        text.getTopWords(0);
     }
 
     @Test(expected = IllegalArgumentException.class)

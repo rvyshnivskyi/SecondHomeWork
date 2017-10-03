@@ -19,7 +19,7 @@ public class Text {
 	}
 
 	public List<String> getTopWords(int topWordsCount) {
-		if (topWordsCount < 0) throw new IllegalArgumentException("Parameter of this method must be positive");
+		if (topWordsCount <= 0) throw new IllegalArgumentException("Parameter of this method must be positive");
 		List<String> uniqueWordsList = getUniqueWordsList(getWordFrequencies());
 		Collections.sort(uniqueWordsList);
 		if (uniqueWordsList.size() < topWordsCount) return uniqueWordsList;
