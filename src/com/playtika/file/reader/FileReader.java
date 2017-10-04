@@ -2,9 +2,8 @@ package com.playtika.file.reader;
 
 import com.playtika.text.analyzer.Text;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.NotDirectoryException;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -17,11 +16,9 @@ import java.util.Map;
 import static java.nio.file.Files.readAttributes;
 
 public class FileReader {
-	private final String startDirectoryPath;
 	private final File startDirectory;
 
 	public FileReader(String startDirectoryPath) throws FileNotFoundException, NotDirectoryException {
-		this.startDirectoryPath = startDirectoryPath;
 		startDirectory = new File(startDirectoryPath);
 		if(!startDirectory.exists()) {
 			throw new FileNotFoundException("File with next path doesn't exist: [" + startDirectoryPath + "]");
@@ -34,11 +31,14 @@ public class FileReader {
 	public static void main(String[] args) {
 		try {
 			FileReader fileReader = new FileReader("C:\\Users\\rvyshnivskyi\\Google Drive\\old_pc\\Docs");
-			Map<File, Map<String, Integer>> wordFrequenciesForFiles = fileReader.getWordFrequenciesForFiles();
-			fileReader.getAllIncludedFiles().forEach(FileReader::printFileInformation);
+			fileReader.copyFile(new File("text.txt"));
+//			Map<File, Map<String, Integer>> wordFrequenciesForFiles = fileReader.getWordFrequenciesForFiles();
+//			fileReader.getAllIncludedFiles().forEach(FileReader::printFileInformation);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (NotDirectoryException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
@@ -68,12 +68,23 @@ public class FileReader {
 		getAllIncludedFiles().forEach(
 				(file) -> {
 					try {
-						fileStringsMap.put(file, new String(Files.readAllBytes(file.toPath()), "UTF-8"));
+						fileStringsMap.put(file, new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8));
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
 				});
 		return fileStringsMap;
+	}
+
+	public void copyFile(File file) throws IOException {
+		File newFile = new File(file.getPath().replaceAll("(?s)(\\.)(?!.*?(\\.))", "New."));
+		try (InputStream inputStream = new BufferedInputStream(new FileInputStream(file)); OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(newFile))) {
+			byte[] buffer = new byte[1024];
+			int length;
+			while ((length = inputStream.read(buffer)) > 0) {
+				outputStream.write(buffer, 0, length);
+			}
+		}
 	}
 
 	private List<File> getAllIncludedFiles() {
