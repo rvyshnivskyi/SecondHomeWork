@@ -2,53 +2,60 @@ package com.playtika.text.analyzer;
 
 import java.util.*;
 
-public class Text {
-	private final String inputText;
+import static java.util.Arrays.asList;
 
-	public Text(String inputText) {
-		this.inputText = inputText;
+public class Text {
+	private final String text;
+
+	public Text(String text) {
+		if (text == null) {
+			throw new IllegalArgumentException("Input text mustn't be nullable");
+		}
+		this.text = text;
 	}
 
 	public int getLengthInChars() {
-		List<String> allWordsList = getAllWordsList();
+		List<String> words = splitInWords();
 		int totalLength = 0;
-		for (String word : allWordsList) {
+		for (String word : words) {
 			totalLength = totalLength + word.length();
 		}
 		return totalLength;
 	}
 
 	public List<String> getTopWords(int topWordsCount) {
-		if (topWordsCount <= 0) throw new IllegalArgumentException("Parameter of this method must be positive");
-		List<String> uniqueWordsList = getUniqueWordsList(getWordFrequencies());
-		Collections.sort(uniqueWordsList);
-		if (uniqueWordsList.size() < topWordsCount) return uniqueWordsList;
-		return uniqueWordsList.subList(0, topWordsCount);
+		if (topWordsCount <= 0) {
+			throw new IllegalArgumentException("Parameter of this method must be positive");
+		}
+		TreeSet<String> uniqueWords = new TreeSet<>();
+		uniqueWords.addAll(splitInWordsAndModifyToLowerCases());
+		if (uniqueWords.size() < topWordsCount) {
+			return new LinkedList<>(uniqueWords);
+		}
+		return new LinkedList<>(uniqueWords).subList(0, topWordsCount);
 	}
 
 	public Map<String, Integer> getWordFrequencies() {
-		List<String> wordsList = getAllWordsList();
+		List<String> words = splitInWordsAndModifyToLowerCases();
 		Map<String, Integer> wordFrequencies = new HashMap<>();
-		wordsList.forEach(
+		words.forEach(
 				(word) -> {
-					word = word.toLowerCase();
 					wordFrequencies.computeIfPresent(word, (key, value) -> value = value + 1);
 					wordFrequencies.putIfAbsent(word, 1);
 		});
 		return wordFrequencies;
 	}
 
-	private List<String> getUniqueWordsList(Map<String, Integer> wordFrequencies) {
-		wordFrequencies.entrySet().removeIf((entry) -> entry.getValue() > 1);
-		return new ArrayList<>(wordFrequencies.keySet());
+	private List<String> splitInWordsAndModifyToLowerCases() {
+		LinkedList<String> lowerCaseWords = new LinkedList<>();
+		splitInWords().forEach(word -> lowerCaseWords.add(word.toLowerCase()));
+		return lowerCaseWords;
 	}
 
-	private List<String> getAllWordsList() {
-		if (inputText == null) {
+	private List<String> splitInWords() {
+		if (text.isEmpty()) {
 			return new LinkedList<>();
 		}
-		List<String> resultList = new LinkedList<>(Arrays.asList(inputText.split("[^a-zA-Z_0-9]")));
-		resultList.removeIf(String::isEmpty);
-		return resultList;
+		return asList(text.split("\\W+"));
 	}
 }

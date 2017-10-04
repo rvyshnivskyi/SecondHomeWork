@@ -13,159 +13,137 @@ public class TextTest {
 
     Text text;
     String textWithoutWords;
-    String textForTestingGetTopWordsMethod;
 
     @Before
     public void setUp() {
         textWithoutWords = "   \n \t ,.'//\n";
-        textForTestingGetTopWordsMethod = "My name is Roma. It is my name";
     }
 
-    @Test
-    public void nullableTextHasZeroLength() {
-        initialiseTestTextObject(null);
-        int wordsTotalLength = text.getLengthInChars();
-        assertThat(wordsTotalLength, is(0));
+    @Test(expected = IllegalArgumentException.class)
+    public void textConstructorThrowsExceptionWhenGetNullableParameter() {
+        new Text(null);
     }
 
     @Test
     public void textWithoutWordsHasZeroWordsLength() {
-        initialiseTestTextObject(textWithoutWords);
+        text = new Text(textWithoutWords);
         int wordsTotalLength = text.getLengthInChars();
         assertThat(wordsTotalLength, is(0));
     }
 
     @Test
     public void emptyTextHasZeroWordsLength() {
-        initialiseTestTextObject("");
+        text = new Text("");
         int wordsTotalLength = text.getLengthInChars();
         assertThat(wordsTotalLength, is(0));
     }
 
     @Test
     public void countOfWordsTotalLengthThatSplitByNonLetterSymbols() {
-        initialiseTestTextObject("   I,.\n want (WaNt) to Be a GOOd specialist. \n\t I  have 5 dollars");
+        text = new Text("   I,.\n want (WaNt) to Be a GOOd specialist. \n\t I  have 5 dollars");
         int wordsTotalLength = text.getLengthInChars();
         assertThat(wordsTotalLength, is(41));
     }
 
     @Test
     public void correctCountOfWordsTotalLength() {
-        initialiseTestTextObject("I have 5 dollars");
+        text = new Text("I have 5 dollars");
         int wordsTotalLength = text.getLengthInChars();
         assertThat(wordsTotalLength, is(13));
     }
 
     @Test
     public void getTopUniqueWordsDetermination() {
-        initialiseTestTextObject("What is your name? - My name is Roma.");
+        text = new Text("What is your name? - Roma is my name.");
         List<String> topWords = text.getTopWords(2);
         assertThat(topWords, hasSize(is(2)));
-        assertThat(topWords, hasItems(equalToIgnoringCase("My"), equalToIgnoringCase("Roma")));
+        assertThat(topWords, hasItems("is", "my"));
     }
 
     @Test
     public void getTopUniqueWordsWithLettersInDifferentRegisters() {
-        initialiseTestTextObject(textForTestingGetTopWordsMethod);
+        text = new Text("My name is Roma. Is it my name");
         List<String> topWords = text.getTopWords(2);
         assertThat(topWords, hasSize(is(2)));
-        assertThat(topWords, hasItems(equalToIgnoringCase("It"), equalToIgnoringCase("Roma")));
+        assertThat(topWords, hasItems("is", "it"));
     }
 
     @Test
     public void getLessUniqueWordsThenExpected() {
-        initialiseTestTextObject(textForTestingGetTopWordsMethod);
+        text = new Text("is it. it is");
         List<String> topWords = text.getTopWords(3);
         assertThat(topWords, hasSize(is(2)));
-        assertThat(topWords, hasItems(equalToIgnoringCase("It"), equalToIgnoringCase("Roma")));
+        assertThat(topWords, hasItems("is", "it"));
     }
 
     @Test
     public void emptyTextHasNoUniqueWords() {
-        initialiseTestTextObject("");
+        text = new Text("");
         List<String> topWords = text.getTopWords(3);
-        assertThat(topWords, empty());
+        assertThat(topWords, is(empty()));
     }
 
     @Test
     public void textWithoutWordsHasNoUniqueWords() {
-        initialiseTestTextObject(textWithoutWords);
+        text = new Text(textWithoutWords);
         List<String> topWords = text.getTopWords(3);
-        assertThat(topWords, empty());
-    }
-
-    @Test
-    public void nullableTextHasNoUniqueWords() {
-        initialiseTestTextObject(null);
-        List<String> topWords = text.getTopWords(3);
-        assertThat(topWords, empty());
+        assertThat(topWords, is(empty()));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void getTopWordsMethodWithZeroParameter() {
-        initialiseTestTextObject(textForTestingGetTopWordsMethod);
+        text = new Text("My name is Roma. It is my name");
         text.getTopWords(0);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void getTopWordsMethodWithNegativeParameterThrowsException() {
-        initialiseTestTextObject(textForTestingGetTopWordsMethod);
+        text = new Text("My name is Roma. It is my name");
         text.getTopWords(-3);
     }
 
     @Test
     public void getWordFrequenciesSimpleFlow() {
-        initialiseTestTextObject("one, one, two");
+        text = new Text("one, one, two");
         Map<String, Integer> wordFrequencies = text.getWordFrequencies();
         assertThat(wordFrequencies.size(), is(equalTo(2)));
         assertThat(wordFrequencies, allOf(
-                hasEntry(equalToIgnoringCase("one"), is(2)),
-                hasEntry(equalToIgnoringCase("two"), is(1))));
+                hasEntry("one", 2),
+                hasEntry("two", 1)));
     }
 
     @Test
     public void getWordFrequenciesWithDifferentRegisterOfSymbolsInWords() {
-        initialiseTestTextObject("One, one, two");
+        text = new Text("One, one, two");
         Map<String, Integer> wordFrequencies = text.getWordFrequencies();
         assertThat(wordFrequencies.size(), is(equalTo(2)));
         assertThat(wordFrequencies, allOf(
-                hasEntry(equalToIgnoringCase("one"), is(2)),
-                hasEntry(equalToIgnoringCase("two"), is(1))));
+                hasEntry("one", 2),
+                hasEntry("two", 1)));
     }
 
     @Test
     public void getWordFrequenciesOfOneRootWords() {
-        initialiseTestTextObject("One, onedrive, two");
+        text = new Text("One, onedrive, two");
         Map<String, Integer> wordFrequencies = text.getWordFrequencies();
         assertThat(wordFrequencies.size(), is(equalTo(3)));
         assertThat(wordFrequencies, allOf(
-                hasEntry(equalToIgnoringCase("one"), is(1)),
-                hasEntry(equalToIgnoringCase("two"), is(1)),
-                hasEntry(equalToIgnoringCase("onedrive"), is(1))));
+                hasEntry("one", 1),
+                hasEntry("two", 1),
+                hasEntry("onedrive", 1)));
     }
 
     @Test
     public void emptyTextHasEmptyWordFrequenciesMap() {
-        initialiseTestTextObject("");
+        text = new Text("");
         Map<String, Integer> wordFrequencies = text.getWordFrequencies();
-        assertThat(wordFrequencies.entrySet(), empty());
-    }
-
-    @Test
-    public void nullableTextHasEmptyWordFrequenciesMap() {
-        initialiseTestTextObject(null);
-        Map<String, Integer> wordFrequencies = text.getWordFrequencies();
-        assertThat(wordFrequencies.entrySet(), empty());
+        assertThat(wordFrequencies.entrySet(), is(empty()));
     }
 
     @Test
     public void textWithoutWordsHasEmptyWordFrequenciesMap() {
-        initialiseTestTextObject(textWithoutWords);
+        text = new Text(textWithoutWords);
         Map<String, Integer> wordFrequencies = text.getWordFrequencies();
-        assertThat(wordFrequencies.entrySet(), empty());
-    }
-
-    void initialiseTestTextObject(String testedText) {
-        this.text = new Text(testedText);
+        assertThat(wordFrequencies.entrySet(), is(empty()));
     }
 }
