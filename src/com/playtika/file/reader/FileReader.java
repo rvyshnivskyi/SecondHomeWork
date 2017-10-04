@@ -30,10 +30,16 @@ public class FileReader {
 
 	public static void main(String[] args) {
 		try {
-			FileReader fileReader = new FileReader("C:\\Users\\rvyshnivskyi\\Google Drive\\old_pc\\Docs");
+			FileReader fileReader = new FileReader("resources/text");
 			fileReader.copyFile(new File("text.txt"));
-//			Map<File, Map<String, Integer>> wordFrequenciesForFiles = fileReader.getWordFrequenciesForFiles();
-//			fileReader.getAllIncludedFiles().forEach(FileReader::printFileInformation);
+			Map<File, Map<String, Integer>> wordFrequenciesForFiles = fileReader.getWordFrequenciesForFiles();
+			wordFrequenciesForFiles.keySet().forEach(file -> {
+				try {
+					printFileInformation(file);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			});
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (NotDirectoryException e) {
@@ -43,16 +49,12 @@ public class FileReader {
 		}
 	}
 
-	public static void printFileInformation(File file) {
+	public static void printFileInformation(File file) throws IOException {
 		BasicFileAttributes fileAttributes = null;
-		try {
-			fileAttributes = readAttributes(file.toPath(), BasicFileAttributes.class);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		fileAttributes = readAttributes(file.toPath(), BasicFileAttributes.class);
 		System.out.printf(
 				"File path: %s | size: %d Bytes | creation date: %s%n",
-				file.getPath(),
+				file.getAbsolutePath(),
 				file.length(),
 				new SimpleDateFormat("dd-MM-yyyy HH:mm").format(fileAttributes.creationTime().toMillis()));
 	}
@@ -61,19 +63,6 @@ public class FileReader {
 		Map<File, Map<String, Integer>> filesWordFrequencies = new HashMap<>();
 		getAllFilesTextAsString().forEach((file, fileText) -> filesWordFrequencies.put(file, new Text(fileText).getWordFrequencies()));
 		return filesWordFrequencies;
-	}
-
-	public Map<File, String> getAllFilesTextAsString() {
-		Map<File, String> fileStringsMap = new HashMap<>();
-		getAllIncludedFiles().forEach(
-				(file) -> {
-					try {
-						fileStringsMap.put(file, new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8));
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				});
-		return fileStringsMap;
 	}
 
 	public void copyFile(File file) throws IOException {
@@ -85,6 +74,19 @@ public class FileReader {
 				outputStream.write(buffer, 0, length);
 			}
 		}
+	}
+
+	private Map<File, String> getAllFilesTextAsString() {
+		Map<File, String> fileStringsMap = new HashMap<>();
+		getAllIncludedFiles().forEach(
+				(file) -> {
+					try {
+						fileStringsMap.put(file, new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8));
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				});
+		return fileStringsMap;
 	}
 
 	private List<File> getAllIncludedFiles() {
