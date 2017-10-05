@@ -40,13 +40,17 @@ public class FileReader {
 		files.forEach(file -> {
 			try {
 				printFileInformation(file);
-				new Text(getStringFromFile(file)).getWordFrequencies()
-						.forEach((word, frequencies) -> wordFrequencies.merge(word, frequencies, Integer::sum));
+				mergeWordFrequencies(wordFrequencies, file);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		});
 		return wordFrequencies;
+	}
+
+	private void mergeWordFrequencies(Map<String, Integer> wordFrequencies, File file) throws IOException {
+		new Text(getStringFromFile(file)).getWordFrequencies()
+				.forEach((word, frequencies) -> wordFrequencies.merge(word, frequencies, Integer::sum));
 	}
 
 	public static void printFileInformation(File file) throws IOException {
@@ -74,7 +78,7 @@ public class FileReader {
 	}
 
 	private String getStringFromFile(File file) throws IOException {
-		return new String(new String(readAllBytes(file.toPath()), UTF_8));
+		return new String(readAllBytes(file.toPath()), UTF_8);
 	}
 
 	private List<File> getAllIncludedFiles() {
