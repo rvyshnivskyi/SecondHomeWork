@@ -48,11 +48,6 @@ public class FileReader {
 		return wordFrequencies;
 	}
 
-	private void mergeWordFrequencies(Map<String, Integer> wordFrequencies, File file) throws IOException {
-		new Text(getStringFromFile(file)).getWordFrequencies()
-				.forEach((word, frequencies) -> wordFrequencies.merge(word, frequencies, Integer::sum));
-	}
-
 	public static void printFileInformation(File file) throws IOException {
 		BasicFileAttributes fileAttributes = readAttributes(file.toPath(), BasicFileAttributes.class);
 		System.out.printf(
@@ -75,6 +70,11 @@ public class FileReader {
 				out.write(buffer, 0, length);
 			}
 		}
+	}
+
+	private void mergeWordFrequencies(Map<String, Integer> wordFrequencies, File file) throws IOException {
+		new Text(getStringFromFile(file)).getWordFrequencies()
+				.forEach((word, frequencies) -> wordFrequencies.merge(word, frequencies, Integer::sum));
 	}
 
 	private String getStringFromFile(File file) throws IOException {
