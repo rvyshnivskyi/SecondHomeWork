@@ -5,7 +5,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class Application {
-
     public int countWords(String text) {
         if (text == null) {
             return 0;

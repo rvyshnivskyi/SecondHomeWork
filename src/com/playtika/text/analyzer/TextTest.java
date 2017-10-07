@@ -61,6 +61,14 @@ public class TextTest {
     }
 
     @Test
+    public void getTopWordsWhenTextStartsFromNonLetterSymbol() {
+        text = new Text(".name");
+        List<String> topWords = text.getTopWords(2);
+        assertThat(topWords, hasSize(is(1)));
+        assertThat(topWords, hasItems("name"));
+    }
+
+    @Test
     public void getTopUniqueWordsWithLettersInDifferentRegisters() {
         text = new Text("My name is Roma. Is it my name");
         List<String> topWords = text.getTopWords(2);
@@ -115,6 +123,16 @@ public class TextTest {
     @Test
     public void getWordFrequenciesWithDifferentRegisterOfSymbolsInWords() {
         text = new Text("One, one, two");
+        Map<String, Integer> wordFrequencies = text.getWordFrequencies();
+        assertThat(wordFrequencies.size(), is(equalTo(2)));
+        assertThat(wordFrequencies, allOf(
+                hasEntry("one", 2),
+                hasEntry("two", 1)));
+    }
+
+    @Test
+    public void getWordFrequenciesWhenTextStartsFromNonLetterSymbol() {
+        text = new Text(",one, one, two");
         Map<String, Integer> wordFrequencies = text.getWordFrequencies();
         assertThat(wordFrequencies.size(), is(equalTo(2)));
         assertThat(wordFrequencies, allOf(

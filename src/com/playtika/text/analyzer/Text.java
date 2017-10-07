@@ -1,8 +1,13 @@
 package com.playtika.text.analyzer;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import static java.util.Arrays.asList;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.*;
 
 public class Text {
 	private final String text;
@@ -15,47 +20,34 @@ public class Text {
 	}
 
 	public int getLengthInChars() {
-		List<String> words = splitInWords();
-		int totalLength = 0;
-		for (String word : words) {
-			totalLength = totalLength + word.length();
-		}
-		return totalLength;
+		return splitInWords().parallelStream()
+				.mapToInt(String::length)
+				.sum();
 	}
 
 	public List<String> getTopWords(int topWordsCount) {
 		if (topWordsCount <= 0) {
 			throw new IllegalArgumentException("Parameter of this method must be positive");
 		}
-		TreeSet<String> uniqueWords = new TreeSet<>();
-		uniqueWords.addAll(splitInWordsAndModifyToLowerCases());
-		if (uniqueWords.size() < topWordsCount) {
-			return new LinkedList<>(uniqueWords);
-		}
-		return new LinkedList<>(uniqueWords).subList(0, topWordsCount);
+		return splitInWords().stream()
+				.distinct()
+				.sorted()
+				.limit(topWordsCount)
+				.collect(toList());
 	}
 
 	public Map<String, Integer> getWordFrequencies() {
-		List<String> words = splitInWordsAndModifyToLowerCases();
-		Map<String, Integer> wordFrequencies = new HashMap<>();
-		words.forEach(
-				(word) -> {
-					wordFrequencies.computeIfPresent(word, (key, value) -> value = value + 1);
-					wordFrequencies.putIfAbsent(word, 1);
-		});
-		return wordFrequencies;
-	}
-
-	private List<String> splitInWordsAndModifyToLowerCases() {
-		LinkedList<String> lowerCaseWords = new LinkedList<>();
-		splitInWords().forEach(word -> lowerCaseWords.add(word.toLowerCase()));
-		return lowerCaseWords;
+		return splitInWords().stream()
+				.collect(groupingBy(identity(), reducing(0, e -> 1, Integer::sum)));
 	}
 
 	private List<String> splitInWords() {
-		if (text.isEmpty()) {
-			return new LinkedList<>();
+		LinkedList<String> words = new LinkedList<>();
+		Pattern pattern = Pattern.compile("\\w+");
+		Matcher matcher = pattern.matcher(text);
+		while (matcher.find()) {
+			words.add(matcher.group().toLowerCase());
 		}
-		return asList(text.split("\\W+"));
+		return words;
 	}
 }

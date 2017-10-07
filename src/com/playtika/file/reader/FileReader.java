@@ -6,7 +6,6 @@ import java.io.*;
 import java.nio.file.NotDirectoryException;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +13,9 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.Files.readAllBytes;
 import static java.nio.file.Files.readAttributes;
 import static java.util.Arrays.asList;
+import static java.util.Map.Entry;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.summingInt;
 
 public class FileReader {
 	private final File startDirectory;
@@ -35,17 +37,11 @@ public class FileReader {
 	}
 
 	public Map<String, Integer> getWordFrequenciesForFiles() {
-		Map<String, Integer> wordFrequencies = new HashMap<>();
-		List<File> files = getAllIncludedFiles();
-		files.forEach(file -> {
-			try {
-				printFileInformation(file);
-				mergeWordFrequencies(wordFrequencies, file);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		});
-		return wordFrequencies;
+		return getAllIncludedFiles().stream()
+				.map(this::getStringFromFileAndPrintInformationAboutFile)
+				.map(Text::new)
+				.flatMap(text -> text.getWordFrequencies().entrySet().stream())
+				.collect(groupingBy(Entry::getKey, summingInt(Entry::getValue)));
 	}
 
 	public static void printFileInformation(File file) throws IOException {
@@ -65,20 +61,23 @@ public class FileReader {
 		try (InputStream in = new BufferedInputStream(new FileInputStream(file));
 			 OutputStream out = new BufferedOutputStream(new FileOutputStream(newFile))) {
 			byte[] buffer = new byte[1024];
-			int length;
-			while ((length = in.read(buffer)) > 0) {
+			int length = in.read(buffer);
+			while (length > 0) {
 				out.write(buffer, 0, length);
+				length = in.read(buffer);
 			}
 		}
 	}
 
-	private void mergeWordFrequencies(Map<String, Integer> wordFrequencies, File file) throws IOException {
-		new Text(getStringFromFile(file)).getWordFrequencies()
-				.forEach((word, frequencies) -> wordFrequencies.merge(word, frequencies, Integer::sum));
-	}
-
-	private String getStringFromFile(File file) throws IOException {
-		return new String(readAllBytes(file.toPath()), UTF_8);
+	private String getStringFromFileAndPrintInformationAboutFile(File file) {
+		String result = "";
+		try {
+			printFileInformation(file);
+			result = new String(readAllBytes(file.toPath()), UTF_8);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return result;
 	}
 
 	private List<File> getAllIncludedFiles() {
