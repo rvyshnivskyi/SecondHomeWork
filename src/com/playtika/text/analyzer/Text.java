@@ -1,6 +1,6 @@
 package com.playtika.text.analyzer;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -20,7 +20,7 @@ public class Text {
 	}
 
 	public int getLengthInChars() {
-		return splitInWords().parallelStream()
+		return splitInWords().stream()
 				.mapToInt(String::length)
 				.sum();
 	}
@@ -42,7 +42,7 @@ public class Text {
 	}
 
 	private List<String> splitInWords() {
-		LinkedList<String> words = new LinkedList<>();
+		List<String> words = new ArrayList<>();
 		Pattern pattern = Pattern.compile("\\w+");
 		Matcher matcher = pattern.matcher(text);
 		while (matcher.find()) {

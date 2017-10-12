@@ -8,6 +8,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.Files.readAllBytes;
@@ -39,6 +40,8 @@ public class FileReader {
 	public Map<String, Integer> getWordFrequenciesForFiles() {
 		return getAllIncludedFiles().stream()
 				.map(this::getStringFromFileAndPrintInformationAboutFile)
+				.filter(Optional::isPresent)
+				.map(Optional::get)
 				.map(Text::new)
 				.flatMap(text -> text.getWordFrequencies().entrySet().stream())
 				.collect(groupingBy(Entry::getKey, summingInt(Entry::getValue)));
@@ -69,15 +72,13 @@ public class FileReader {
 		}
 	}
 
-	private String getStringFromFileAndPrintInformationAboutFile(File file) {
-		String result = "";
+	private Optional<String> getStringFromFileAndPrintInformationAboutFile(File file) {
 		try {
 			printFileInformation(file);
-			result = new String(readAllBytes(file.toPath()), UTF_8);
+			return Optional.ofNullable(new String(readAllBytes(file.toPath()), UTF_8));
 		} catch (IOException e) {
-			e.printStackTrace();
+			return Optional.empty();
 		}
-		return result;
 	}
 
 	private List<File> getAllIncludedFiles() {

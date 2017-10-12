@@ -28,4 +28,13 @@ public class Person {
     public String getCity() {
         return city;
     }
+
+    public void incrementAge() {
+        // need add logic
+        this.age++;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
 }
